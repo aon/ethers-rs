@@ -93,7 +93,8 @@ impl JsonRpcClient for Provider {
         let next_id = self.id.fetch_add(1, Ordering::SeqCst);
         let payload = Request::new(next_id, method, params);
 
-        let res = self.client.post(self.url.as_ref()).json(&payload).send().await?;
+        let res =
+            self.client.post(self.url.as_ref()).json(&payload).send().await?.error_for_status()?;
         let body = res.bytes().await?;
 
         let raw = match serde_json::from_slice(&body) {
